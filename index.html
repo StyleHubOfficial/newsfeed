@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permanent File Storage</title>
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #6b8cbc;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .upload-section {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+        
+        .upload-area {
+            border: 2px dashed #ced4da;
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover, .upload-area.drag-over {
+            border-color: var(--primary-color);
+            background-color: rgba(74, 111, 165, 0.05);
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .upload-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+        
+        .upload-btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .files-section {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e9ecef;
+            color: var(--primary-color);
+        }
+        
+        .files-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .file-card {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .file-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .file-preview {
+            height: 150px;
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .file-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .file-preview .file-icon {
+            font-size: 48px;
+            color: var(--primary-color);
+        }
+        
+        .file-info {
+            padding: 15px;
+        }
+        
+        .file-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .file-details {
+            font-size: 0.85rem;
+            color: #6c757d;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .file-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        
+        .download-btn, .delete-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+        
+        .download-btn {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .download-btn:hover {
+            background-color: #218838;
+        }
+        
+        .delete-btn {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 6px;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: translateX(150%);
+            transition: transform 0.3s;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background-color: var(--success-color);
+        }
+        
+        .notification.error {
+            background-color: var(--danger-color);
+        }
+        
+        @media (max-width: 768px) {
+            .files-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .files-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .upload-section, .files-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Permanent File Storage</h1>
+            <p class="subtitle">Upload and access your files anytime, anywhere</p>
+        </header>
+        
+        <section class="upload-section">
+            <h2 class="section-title">Upload Files</h2>
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📁</div>
+                <p>Drag & drop files here or click to browse</p>
+                <input type="file" class="file-input" id="fileInput" multiple>
+                <button class="upload-btn" id="uploadBtn">Upload Files</button>
+            </div>
+            <div id="fileList"></div>
+        </section>
+        
+        <section class="files-section">
+            <h2 class="section-title">Your Files</h2>
+            <div class="files-grid" id="filesGrid">
+                <!-- Files will be displayed here -->
+            </div>
+            <div class="empty-state" id="emptyState">
+                <div class="empty-state-icon">📂</div>
+                <h3>No files uploaded yet</h3>
+                <p>Upload your first file using the form above</p>
+            </div>
+        </section>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+    
+    <script>
+        // DOM Elements
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const filesGrid = document.getElementById('filesGrid');
+        const emptyState = document.getElementById('emptyState');
+        const notification = document.getElementById('notification');
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFilesFromStorage();
+            
+            // Event listeners
+            uploadArea.addEventListener('click', () => fileInput.click());
+            uploadArea.addEventListener('dragover', handleDragOver);
+            uploadArea.addEventListener('dragleave', handleDragLeave);
+            uploadArea.addEventListener('drop', handleDrop);
+            fileInput.addEventListener('change', handleFileSelect);
+            uploadBtn.addEventListener('click', handleUpload);
+        });
+        
+        // Drag and drop handlers
+        function handleDragOver(e) {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        }
+        
+        function handleDragLeave(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                processFiles(files);
+            }
+        }
+        
+        // File selection handler
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                processFiles(files);
+            }
+        }
+        
+        // Upload button handler
+        function handleUpload() {
+            fileInput.click();
+        }
+        
+        // Process selected files
+        function processFiles(files) {
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+            
+            Array.from(files).forEach(file => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <p>${file.name} (${formatFileSize(file.size)})</p>
+                `;
+                fileList.appendChild(fileItem);
+                
+                // Save file to storage
+                saveFileToStorage(file);
+            });
+            
+            // Clear the file input
+            fileInput.value = '';
+            
+            // Show success notification
+            showNotification('Files uploaded successfully!', 'success');
+            
+            // Reload the files display
+            loadFilesFromStorage();
+        }
+        
+        // Save file to localStorage (simulating permanent storage)
+        function saveFileToStorage(file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const fileData = {
+                    name: file.name,
+                    type: file.type,
+                    size: file.size,
+                    data: e.target.result,
+                    uploadDate: new Date().toISOString()
+                };
+                
+                // Get existing files from storage
+                let storedFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || [];
+                
+                // Add new file
+                storedFiles.push(fileData);
+                
+                // Save back to storage
+                localStorage.setItem('uploadedFiles', JSON.stringify(storedFiles));
+            };
+            
+            reader.readAsDataURL(file);
+        }
+        
+        // Load files from storage and display them
+        function loadFilesFromStorage() {
+            const storedFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || [];
+            
+            if (storedFiles.length === 0) {
+                filesGrid.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            filesGrid.innerHTML = '';
+            
+            storedFiles.forEach((file, index) => {
+                const fileCard = document.createElement('div');
+                fileCard.className = 'file-card';
+                
+                let previewContent = '';
+                if (file.type.startsWith('image/')) {
+                    previewContent = `<img src="${file.data}" alt="${file.name}">`;
+                } else {
+                    previewContent = `<div class="file-icon">📄</div>`;
+                }
+                
+                fileCard.innerHTML = `
+                    <div class="file-preview">
+                        ${previewContent}
+                    </div>
+                    <div class="file-info">
+                        <div class="file-name">${file.name}</div>
+                        <div class="file-details">
+                            <span>${formatFileSize(file.size)}</span>
+                            <span>${formatDate(file.uploadDate)}</span>
+                        </div>
+                        <div class="file-actions">
+                            <button class="download-btn" data-index="${index}">Download</button>
+                            <button class="delete-btn" data-index="${index}">Delete</button>
+                        </div>
+                    </div>
+                `;
+                
+                filesGrid.appendChild(fileCard);
+            });
+            
+            // Add event listeners to download and delete buttons
+            document.querySelectorAll('.download-btn').forEach(btn => {
+                btn.addEventListener('click', handleDownload);
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', handleDelete);
+            });
+        }
+        
+        // Handle file download
+        function handleDownload(e) {
+            const index = e.target.getAttribute('data-index');
+            const storedFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || [];
+            const file = storedFiles[index];
+            
+            const a = document.createElement('a');
+            a.href = file.data;
+            a.download = file.name;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            showNotification('File downloaded successfully!', 'success');
+        }
+        
+        // Handle file deletion
+        function handleDelete(e) {
+            const index = e.target.getAttribute('data-index');
+            const storedFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || [];
+            
+            // Remove file from array
+            storedFiles.splice(index, 1);
+            
+            // Save updated array back to storage
+            localStorage.setItem('uploadedFiles', JSON.stringify(storedFiles));
+            
+            // Reload files display
+            loadFilesFromStorage();
+            
+            showNotification('File deleted successfully!', 'success');
+        }
+        
+        // Utility function to format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // Utility function to format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString();
+        }
+        
+        // Show notification
+        function showNotification(message, type) {
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
