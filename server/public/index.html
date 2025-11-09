@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FocusNews — Professional Hi‑Tech</title>
+  <meta name="description" content="FocusNews — adaptive reading, wellness suggestions, and AI rewriting in a professional hi‑tech interface." />
+
+  <!-- Tailwind (deferred) -->
+  <script src="https://cdn.tailwindcss.com" defer></script>
+
+  <!-- Inter font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg-1:#071226;
+      --bg-2:#0b1628;
+      --accent-1:#00e5d7;
+      --accent-2:#6a4bff;
+      --glass: rgba(255,255,255,0.03);
+      --muted: #9fb0c6;
+      --card-radius: 12px;
+    }
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:linear-gradient(180deg,var(--bg-1),var(--bg-2));color:#e6f3ff;-webkit-font-smoothing:antialiased;}
+    .app {position:relative;min-height:100vh;z-index:1}
+    /* subtle background layers */
+    .bg-layers{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+    .bg-vignette{position:absolute;inset:0;background:radial-gradient(60% 40% at 10% 20%, rgba(106,75,255,0.06), transparent 10%), radial-gradient(60% 40% at 90% 80%, rgba(0,229,215,0.05), transparent 10%);filter:blur(26px);opacity:.9}
+    .bg-grid{position:absolute;inset:0;background-image: linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px); background-size: 160px 160px, 160px 160px; mix-blend-mode: overlay; opacity: .08;}
+    /* card style */
+    .card{background:var(--glass);border:1px solid rgba(255,255,255,0.04);box-shadow: 0 8px 30px rgba(0,0,0,0.5);border-radius:var(--card-radius);backdrop-filter: blur(8px)}
+    .glass-pill {background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:999px;padding:6px 10px;border:1px solid rgba(255,255,255,0.03);} 
+    /* small micro interactions */
+    .tilt {transition: transform .28s cubic-bezier(.2,.9,.2,1); will-change: transform;}
+    .tilt:hover {transform: translateY(-8px) rotateX(2.2deg) rotateY(-2.2deg)}
+    .accent-line {height:3px;border-radius:6px;background:linear-gradient(90deg,var(--accent-1),var(--accent-2));box-shadow:0 8px 24px rgba(106,75,255,0.08) inset;}
+    .muted {color:var(--muted)}
+    /* shimmer placeholder */
+    .shimmer {position:relative;overflow:hidden}
+    .shimmer::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.06),transparent);transform:translateX(-120%);animation:shimmer 1.4s linear infinite}
+    @keyframes shimmer {100%{transform:translateX(120%)}} 
+    /* reveal animation */
+    .reveal {opacity:0;transform:translateY(8px) scale(.997);animation:revealIn .64s forwards ease}
+    .reveal.delay-1 {animation-delay:.06s} .reveal.delay-2{animation-delay:.12s} .reveal.delay-3{animation-delay:.18s}
+    @keyframes revealIn {to {opacity:1;transform:translateY(0) scale(1)}}
+    /* ring progress */
+    .ring {width:84px;height:84px;display:inline-block}
+    /* responsive */
+    @media (max-width: 880px){ .layout-grid {grid-template-columns:1fr} .hide-sm{display:none} }
+    :focus{outline: 3px solid rgba(0,229,215,0.14); outline-offset: 3px}
+  </style>
+</head>
+<body>
+  <div class="bg-layers" aria-hidden="true">
+    <div class="bg-vignette"></div>
+    <div class="bg-grid"></div>
+  </div>
+
+  <div class="app">
+    <header class="relative z-10 p-5 max-w-6xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="card p-2 rounded-lg inline-flex items-center justify-center" aria-hidden="true">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h16" stroke="#9df7e8" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div style="font-weight:700">FocusNews</div>
+          <div class="muted text-sm hide-sm">Professional Hi‑Tech News • Adaptive Reading • Wellness</div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="relative">
+          <input id="search" class="glass-pill text-sm bg-transparent placeholder:muted px-3 pr-12 w-48 md:w-72" placeholder="Search topics or authors" aria-label="Search field" />
+          <button id="searchBtn" class="absolute right-1 top-1 text-xs px-2 py-1 rounded-md glass-pill">Search</button>
+        </div>
+
+        <button id="modeBtn" class="glass-pill text-sm" aria-label="Current mode" title="Shows server mode (OpenAI, Local, Demo)">Mode</button>
+        <div class="card p-1 rounded-full flex items-center justify-center" aria-hidden="true"><div class="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-200 to-purple-400 font-bold text-black flex items-center justify-center">A</div></div>
+      </div>
+    </header>
+
+    <main class="relative z-10 max-w-6xl mx-auto p-6">
+      <div class="grid layout-grid grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-6">
+          <!-- HERO ARTICLE -->
+          <article class="card p-6 tilt reveal delay-1" aria-labelledby="hero-title" role="article">
+            <div class="flex items-start justify-between gap-4">
+              <div style="min-width:0">
+                <h1 id="hero-title" class="text-2xl md:text-3xl font-extrabold">FocusNews — Quantum Breakthrough</h1>
+                <p class="muted text-sm mt-1">AI-assisted summaries • professional tone rewriting • adaptive reading controls</p>
+
+                <div class="mt-4 flex flex-wrap gap-3">
+                  <button class="px-4 py-2 rounded-md bg-gradient-to-r from-cyan-300 to-purple-500 text-black font-semibold" onclick="rewriteArticleTone('professional')">Rewrite (Pro)</button>
+                  <button class="px-3 py-2 rounded-md border border-white/6 text-sm" onclick="rewriteArticleTone('simple')">Simplify</button>
+                  <button class="px-3 py-2 rounded-md border border-white/6 text-sm" onclick="rewriteArticleTone('dramatic')">Dramatic</button>
+                </div>
+              </div>
+
+              <div class="text-right">
+                <div id="focus-score" class="card p-2 rounded-lg ring reveal delay-2" style="min-width:96px;">
+                  <svg width="64" height="64" viewBox="0 0 120 120" aria-hidden="true">
+                    <defs><linearGradient id="gA" x1="0%" x2="100%"><stop offset="0%" stop-color="#00e5d7"/><stop offset="100%" stop-color="#6a4bff/></linearGradient></defs>
+                    <circle cx="60" cy="60" r="48" stroke="rgba(255,255,255,0.06)" stroke-width="8" fill="none"></circle>
+                    <circle id="progressRing" cx="60" cy="60" r="48" stroke="url(#gA)" stroke-width="8" stroke-linecap="round" fill="none" stroke-dasharray="301.44" stroke-dashoffset="301.44" class="progress-ring"></circle>
+                    <text x="60" y="66" text-anchor="middle" font-size="18" fill="#e6f3ff" font-weight="700">82</text>
+                  </svg>
+                  <div class="text-xs muted mt-1">Focus Score</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="card p-4 rounded-md reveal delay-2">
+                <div class="text-sm muted">AI Confidence</div>
+                <div class="text-lg text-green-300 font-semibold mt-2">98%</div>
+              </div>
+              <div class="card p-4 rounded-md reveal delay-2">
+                <div class="text-sm muted">Sentiment</div>
+                <div class="text-lg text-yellow-300 font-semibold mt-2">Positive</div>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <h3 class="text-sm muted">Original</h3>
+              <p id="original-article-text" class="mt-2 text-slate-200">The new quantum computing breakthrough significantly reduces calculation time for complex molecular modeling.</p>
+            </div>
+
+            <div class="mt-4">
+              <div id="rewritten-article-output" class="card p-3 rounded-md muted italic reveal delay-3" aria-live="polite">Select a tone to generate a rewritten summary. Results appear here.</div>
+            </div>
+          </article>
+
+          <!-- Recommendations -->
+          <section class="card p-4 reveal delay-2">
+            <div class="flex items-center justify-between mb-3">
+              <h4 class="font-semibold">Personalized Recommendations</h4>
+              <div class="text-xs muted">Adaptive • animated</div>
+            </div>
+
+            <div class="overflow-hidden">
+              <div id="recTrack" class="carousel-track flex gap-3 transition-transform duration-300 will-change-transform">
+                <div class="p-4 card rounded-md min-w-[220px]">
+                  <div class="muted text-sm">Quick break</div>
+                  <div class="font-semibold mt-1">Stand and stretch for 60s</div>
+                </div>
+                <div class="p-4 card rounded-md min-w-[220px]">
+                  <div class="muted text-sm">Reading tip</div>
+                  <div class="font-semibold mt-1">Skim headings then deep read</div>
+                </div>
+                <div class="p-4 card rounded-md min-w-[220px]">
+                  <div class="muted text-sm">Focus task</div>
+                  <div class="font-semibold mt-1">25-minute sprint</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-3 flex gap-2">
+              <button id="recPrev" class="px-3 py-1 rounded-md border border-white/6 text-sm">Prev</button>
+              <button id="recNext" class="px-3 py-1 rounded-md bg-gradient-to-r from-cyan-300 to-purple-500 text-black font-semibold">Next</button>
+              <div class="ml-auto"><button id="recRefresh" class="px-3 py-1 rounded-md border border-white/6 text-sm" onclick="generateWellnessSuggestion()">Refresh</button></div>
+            </div>
+          </section>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <aside class="space-y-6">
+          <div class="card p-4 rounded-md reveal delay-1">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="muted text-sm">Smart Break</div>
+                <div id="pomodoro-timer" class="text-3xl font-mono mt-2">25:00</div>
+              </div>
+              <div>
+                <button id="start-btn" class="px-3 py-2 rounded-md bg-gradient-to-r from-cyan-300 to-purple-500 text-black font-semibold">Start</button>
+              </div>
+            </div>
+            <div class="mt-2 muted text-sm" id="break-suggestion" aria-live="polite">Suggested: 10 deep breaths</div>
+          </div>
+
+          <div class="card p-4 rounded-md reveal delay-2">
+            <div class="flex items-center justify-between">
+              <div class="muted text-sm">Reading Mode</div>
+              <div><button id="focus-mode-toggle" class="px-2 py-1 rounded-md border border-white/8 text-sm">Toggle</button></div>
+            </div>
+            <div class="mt-2 muted text-sm">Dyslexia font • High contrast • Adjustable size</div>
+          </div>
+
+          <div class="card p-4 rounded-md reveal delay-3">
+            <div class="text-sm muted">Achievements</div>
+            <div class="mt-3 flex items-center gap-3">
+              <div class="p-3 rounded-md bg-gradient-to-br from-cyan-300 to-purple-400 font-bold text-black">🏆</div>
+              <div>
+                <div class="muted text-sm">Streak</div>
+                <div class="font-semibold">7 days</div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </main>
+
+    <footer class="max-w-6xl mx-auto p-6 muted text-xs text-center">© FocusNews • Privacy-first • Demo-ready</footer>
+  </div>
+
+  <script>
+    // Default: same origin; keep blank for server-hosted index
+    window.API_BASE = '';
+
+    // Lazy load optional libs (icons & vanta)
+    (function lazyLoad() {
+      const idle = window.requestIdleCallback || (fn => setTimeout(fn, 400));
+      idle(async () => {
+        // lucide icons
+        try {
+          const s = document.createElement('script');
+          s.src = 'https://unpkg.com/lucide@latest';
+          s.defer = true;
+          s.onload = () => { if (window.lucide) lucide.replace(); };
+          document.head.appendChild(s);
+        } catch (e) { /* no-op */ }
+
+        // Vanta background (optional WebGL)
+        try {
+          if (!window.THREE) {
+            await new Promise((res, rej) => {
+              const t = document.createElement('script');
+              t.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js';
+              t.onload = res; t.onerror = rej; document.head.appendChild(t);
+            });
+          }
+          await new Promise((res, rej) => {
+            const v = document.createElement('script');
+            v.src = 'https://cdn.jsdelivr.net/npm/vanta@0.5.21/dist/vanta.net.min.js';
+            v.onload = res; v.onerror = rej; document.head.appendChild(v);
+          });
+          if (window.VANTA) window.vantaEffect = VANTA.NET({ el: document.querySelector('.bg-vignette'), color: 0x003b2f, backgroundColor: 0x071226, points: 10, maxDistance: 22, spacing: 20 });
+        } catch (err) {
+          // silent fallback to CSS layers if WebGL fails
+          console.warn('Vanta failed', err);
+        }
+      });
+    })();
+
+    // Utility: API base
+    function api(path) { return (window.API_BASE || '') + path; }
+
+    // Progress ring
+    function setProgress(p) {
+      const circle = document.getElementById('progressRing');
+      if (!circle) return;
+      const r = 48;
+      const c = 2 * Math.PI * r;
+      circle.style.strokeDasharray = String(c);
+      circle.style.strokeDashoffset = String(c - (p / 100) * c);
+    }
+    document.addEventListener('DOMContentLoaded', () => setTimeout(()=> setProgress(82), 350));
+
+    // Carousel
+    const recTrack = document.getElementById('recTrack');
+    let recIndex = 0;
+    function updateRec() {
+      if (!recTrack || recTrack.children.length === 0) return;
+      const w = recTrack.children[0].getBoundingClientRect().width + 12;
+      recTrack.style.transform = `translateX(${-recIndex * w}px)`;
+    }
+    document.getElementById('recNext')?.addEventListener('click', () => { recIndex = (recIndex + 1) % recTrack.children.length; updateRec(); });
+    document.getElementById('recPrev')?.addEventListener('click', () => { recIndex = (recIndex - 1 + recTrack.children.length) % recTrack.children.length; updateRec(); });
+    window.addEventListener('resize', () => setTimeout(updateRec, 120));
+
+    // Focus mode toggle (collapses aside)
+    document.getElementById('focus-mode-toggle')?.addEventListener('click', () => {
+      document.querySelector('aside')?.classList.toggle('hidden');
+      document.querySelector('header')?.classList.toggle('opacity-30');
+    });
+
+    // Pomodoro timer (simple)
+    let pomodoroDuration = 25 * 60;
+    let timer = null;
+    let remaining = pomodoroDuration;
+    const timerEl = document.getElementById('pomodoro-timer');
+
+    function formatMMSS(s) { return `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`; }
+    function startPomodoro() {
+      if (timer) return;
+      const startBtn = document.getElementById('start-btn');
+      if (startBtn) startBtn.textContent = 'Pause';
+      timer = setInterval(() => {
+        remaining--;
+        if (timerEl) timerEl.textContent = formatMMSS(remaining);
+        if (remaining <= 0) {
+          clearInterval(timer); timer = null; remaining = pomodoroDuration;
+          if (startBtn) startBtn.textContent = 'Start';
+          flashConfetti();
+        }
+      }, 1000);
+      document.getElementById('start-btn').onclick = pausePomodoro;
+    }
+    function pausePomodoro() {
+      if (timer) clearInterval(timer);
+      timer = null;
+      const startBtn = document.getElementById('start-btn');
+      if (startBtn) startBtn.textContent = 'Start';
+      if (startBtn) startBtn.onclick = startPomodoro;
+    }
+    document.getElementById('start-btn')?.addEventListener('click', startPomodoro);
+    function flashConfetti() {
+      const el = document.createElement('div');
+      el.style.position = 'fixed'; el.style.inset = 0; el.style.zIndex = 60; el.style.pointerEvents = 'none';
+      el.style.background = 'radial-gradient(circle at 20% 30%, rgba(0,229,215,0.06), transparent 10%), radial-gradient(circle at 80% 70%, rgba(106,75,255,0.06), transparent 12%)';
+      document.body.appendChild(el); setTimeout(()=> el.remove(), 800);
+    }
+
+    // LLM integration: rewrite and suggestion
+    async function rewriteArticleTone(tone) {
+      const outEl = document.getElementById('rewritten-article-output');
+      if (!outEl) return;
+      outEl.textContent = 'Generating…'; outEl.classList.add('shimmer');
+      try {
+        const original = document.getElementById('original-article-text')?.textContent || '';
+        const resp = await fetch(api('/api/rewrite'), {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ text: original, tone })
+        });
+        if (!resp.ok) {
+          outEl.textContent = 'Error generating rewrite';
+          return;
+        }
+        const data = await resp.json();
+        outEl.textContent = data.rewritten || data.output || 'No result';
+        outEl.animate([{opacity:0},{opacity:1}], {duration: 260, fill:'forwards'});
+      } catch (err) {
+        console.error(err);
+        outEl.textContent = 'Network error';
+      } finally {
+        outEl.classList.remove('shimmer');
+      }
+    }
+
+    async function generateWellnessSuggestion() {
+      const el = document.getElementById('break-suggestion');
+      if (!el) return;
+      el.textContent = 'Thinking…'; el.classList.add('shimmer');
+      try {
+        const resp = await fetch(api('/api/suggestion'), {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ context: 'reader mildly fatigued' })
+        });
+        if (!resp.ok) { el.textContent = 'Unavailable'; return; }
+        const data = await resp.json();
+        el.textContent = data.suggestion || data.output || 'Take a short break';
+        el.animate([{transform:'scale(.98)'},{transform:'scale(1.02)'},{transform:'scale(1)'}], {duration:380});
+      } catch (err) {
+        console.error(err); el.textContent = 'Network error';
+      } finally { el.classList.remove('shimmer'); }
+    }
+
+    // Mode banner: reads /api/mode and shows a small banner if not openai
+    async function fetchModeAndNotify() {
+      try {
+        const resp = await fetch(api('/api/mode'));;
+        if (!resp.ok) return;
+        const info = await resp.json();
+        if (info.mode && info.mode !== 'openai') {
+          const banner = document.createElement('div');
+          banner.setAttribute('role','status');
+          banner.className = 'fixed left-1/2 -translate-x-1/2 top-4 z-50 px-4 py-2 rounded-md';
+          banner.style.background = 'linear-gradient(90deg, rgba(255,210,88,0.06), rgba(255,210,88,0.02))';
+          banner.style.color = '#ffd77a';
+          banner.style.border = '1px solid rgba(255,210,88,0.14)';
+          banner.style.backdropFilter = 'blur(6px)';
+          banner.textContent = info.mode === 'simulate'
+            ? 'Demo Mode — simulated responses (no API key configured).'
+            : `Local Model Mode — forwarding to ${info.info || 'local model'}.`;
+          document.body.appendChild(banner);
+          setTimeout(()=> banner.remove(), 7000);
+        } else {
+          document.getElementById('modeBtn').textContent = 'Live AI';
+        }
+      } catch (e) { console.warn('mode check failed', e); }
+    }
+    window.addEventListener('load', fetchModeAndNotify);
+
+    // Keyboard accessibility: slash to focus search
+    document.addEventListener('keydown', (e) => {
+      if (e.key === '/' && document.activeElement?.tagName !== 'INPUT') {
+        e.preventDefault();
+        document.getElementById('search')?.focus();
+      }
+    });
+  </script>
+</body>
+</html>
