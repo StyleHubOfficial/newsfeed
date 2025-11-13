@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FocusNews AI Dashboard</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Load Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    
+    <!-- Load Chart.js for advanced analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Load AOS for scroll animations -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <style>
+        :root {
+            --color-primary: #1a1a2e;
+            --color-secondary: #16213e;
+            --color-accent: #0ea5e9;
+            --color-accent-glow: rgba(14, 165, 233, 0.5);
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-danger: #ef4444;
+            --color-text: #e2e8f0;
+            --color-text-muted: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            color: var(--color-text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Animated gradient background */
+        .animated-bg {
+            background: linear-gradient(-45deg, #1a1a2e, #16213e, #0f3460, #1a1a2e);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating animation */
+        .float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Glow effect */
+        .glow {
+            box-shadow: 0 0 20px var(--color-accent-glow);
+        }
+
+        /* Text glow */
+        .text-glow {
+            text-shadow: 0 0 10px var(--color-accent-glow);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--color-accent);
+            border-radius: 10px;
+        }
+
+        /* Loading animation */
+        .loader {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid var(--color-accent);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Particle effect */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            background: var(--color-accent);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: particle-float 20s infinite linear;
+        }
+
+        @keyframes particle-float {
+            0% { transform: translateY(0) translateX(0); }
+            100% { transform: translateY(-100vh) translateX(100px); }
+        }
+
+        /* Typewriter effect */
+        .typewriter {
+            overflow: hidden;
+            border-right: 2px solid var(--color-accent);
+            white-space: nowrap;
+            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--color-accent) }
+        }
+
+        /* Holographic effect */
+        .holographic {
+            background: linear-gradient(125deg, 
+                rgba(14, 165, 233, 0.1) 0%, 
+                rgba(99, 102, 241, 0.1) 25%, 
+                rgba(139, 92, 246, 0.1) 50%, 
+                rgba(236, 72, 153, 0.1) 75%, 
+                rgba(14, 165, 233, 0.1) 100%);
+            background-size: 400% 400%;
+            animation: holographic 8s ease infinite;
+        }
+
+        @keyframes holographic {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Card hover effect */
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Progress ring */
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-circle {
+            stroke-dasharray: 283;
+            stroke-dashoffset: 283;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+
+        /* Neural network visualization */
+        .neural-network {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .neural-network::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(14, 165, 233, 0.2), transparent);
+            transform: translateX(-100%);
+            animation: neural-scan 3s linear infinite;
+        }
+
+        @keyframes neural-scan {
+            100% { transform: translateX(100%); }
+        }
+
+        /* Notification pulse */
+        .pulse-notification {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(14, 165, 233, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0); }
+        }
+
+        /* Data stream effect */
+        .data-stream {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .data-stream::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(14, 165, 233, 0.1), transparent);
+            transform: translateY(-100%);
+            animation: data-flow 3s linear infinite;
+        }
+
+        @keyframes data-flow {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+    </style>
+</head>
+
+<body class="animated-bg">
+    <!-- Particle Background -->
+    <div class="particles" id="particles-container"></div>
+
+    <!-- Loading Screen -->
+    <div id="app-loader" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gray-900">
+        <div class="flex flex-col items-center">
+            <div class="relative mb-8">
+                <div class="w-24 h-24 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center float">
+                    <svg class="w-12 h-12 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2 12h6l2-4 3 8 3-8 2 4h6"></path>
+                    </svg>
+                </div>
+                <div class="absolute -inset-2 rounded-full bg-cyan-500/30 blur-md"></div>
+            </div>
+            <h1 class="text-3xl font-bold text-white mb-2 typewriter">FocusNews AI</h1>
+            <p class="text-gray-400 mb-6">Initializing neural interface...</p>
+            <div class="loader"></div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="app-container" class="hidden min-h-screen">
+        <!-- Header -->
+        <header class="glass sticky top-0 z-40">
+            <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M2 12h6l2-4 3 8 3-8 2 4h6"></path>
+                            </svg>
+                        </div>
+                        <h1 class="text-xl font-bold text-white">FocusNews AI</h1>
+                    </div>
+                    <div class="hidden md:flex space-x-1">
+                        <button id="nav-news" class="nav-btn active px-4 py-2 rounded-lg transition-all duration-300">News Feed</button>
+                        <button id="nav-dashboard" class="nav-btn px-4 py-2 rounded-lg transition-all duration-300">Dashboard</button>
+                        <button id="nav-analytics" class="nav-btn px-4 py-2 rounded-lg transition-all duration-300">Analytics</button>
+                        <button id="nav-settings" class="nav-btn px-4 py-2 rounded-lg transition-all duration-300">Settings</button>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <button id="notifications-btn" class="p-2 rounded-full hover:bg-white/10 transition">
+                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                            </svg>
+                            <span class="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full pulse-notification"></span>
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-2 cursor-pointer">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500"></div>
+                        <span class="hidden md:inline text-sm font-medium">Alex Johnson</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Mobile Navigation -->
+        <div class="md:hidden fixed bottom-0 left-0 right-0 glass z-30">
+            <div class="flex justify-around py-3">
+                <button id="mobile-nav-news" class="mobile-nav-btn active flex flex-col items-center">
+                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                    </svg>
+                    <span class="text-xs mt-1">News</span>
+                </button>
+                <button id="mobile-nav-dashboard" class="mobile-nav-btn flex flex-col items-center">
+                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
+                    <span class="text-xs mt-1">Dashboard</span>
+                </button>
+                <button id="mobile-nav-analytics" class="mobile-nav-btn flex flex-col items-center">
+                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9v-9m0-9v9"></path>
+                    </svg>
+                    <span class="text-xs mt-1">Analytics</span>
+                </button>
+                <button id="mobile-nav-settings" class="mobile-nav-btn flex flex-col items-center">
+                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 165 0 0 0-1.51 1z"></path>
+                    </svg>
+                    <span class="text-xs mt-1">Settings</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 py-6 pb-20 md:pb-6">
+            <!-- News Feed View -->
+            <div id="view-news" class="view active">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Main Content Column -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <!-- AI News Summarizer -->
+                        <div class="glass rounded-2xl p-6 card-hover" data-aos="fade-up">
+                            <div class="flex justify-between items-start mb-4">
+                                <h2 class="text-2xl font-bold text-white">AI News Digest</h2>
+                                <div class="flex space-x-2">
+                                    <button class="p-2 rounded-full hover:bg-white/10 transition">
+                                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                                        </svg>
+                                    </button>
+                                    <button class="p-2 rounded-full hover:bg-white/10 transition">
+                                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="1"></circle>
+                                            <circle cx="12" cy="5" r="1"></circle>
+                                            <circle cx="12" cy="19" r="1"></circle>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <!-- News Item 1 -->
+                                <div class="p-4 rounded-xl bg-white/5 hover:bg-white/10 transition cursor-pointer neural-network">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h3 class="font-semibold text-white">Quantum Computing Breakthrough</h3>
+                                            <p class="text-sm text-gray-400 mt-1">Researchers achieve 99.9% accuracy in quantum error correction</p>
+                                        </div>
+                                        <span class="text-xs bg-cyan-500/20 text-cyan-400 px-2 py-1 rounded-full">SCIENCE</span>
+                                    </div>
+                                    <div class="flex items-center mt-3 text-xs text-gray-500">
+                                        <span>MIT Technology Review</span>
+                                        <span class="mx-2">•</span>
+                                        <span>2 hours ago</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- News Item 2 -->
+                                <div class="p-4 rounded-xl bg-white/5 hover:bg-white/10 transition cursor-pointer neural-network">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h3 class="font-semibold text-white">Global Climate Summit Reaches Agreement</h3>
+                                            <p class="text-sm text-gray-400 mt-1">Nations commit to 50% emissions reduction by 2030</p>
+                                        </div>
+                                        <span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded-full">POLITICS</span>
+                                    </div>
+                                    <div class="flex items-center mt-3 text-xs text-gray-500">
+                                        <span>Global News Network</span>
+                                        <span class="mx-2">•</span>
+                                        <span>5 hours ago</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- News Item 3 -->
+                                <div class="p-4 rounded-xl bg-white/5 hover:bg-white/10 transition cursor-pointer neural-network">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h3 class="font-semibold text-white">AI Model Outperforms Humans in Creative Tasks</h3>
+                                            <p class="text-sm text-gray-400 mt-1">New neural network demonstrates advanced creative problem-solving</p>
+                                        </div>
+                                        <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded-full">TECH</span>
+                                    </div>
+                                    <div class="flex items-center mt-3 text-xs text-gray-500">
+                                        <span>AI Research Journal</span>
+                                        <span class="mx-2">•</span>
+                                        <span>1 day ago</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6 pt-4 border-t border-white/10">
+                                <button class="w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 transition flex items-center justify-center">
+                                    <span>Load More Articles</span>
+                                    <svg class="w-4 h-4 ml-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- AI Content Analysis -->
+                        <div class="glass rounded-2xl p-6 card-hover" data-aos="fade-up" data-aos-delay="100">
+                            <h2 class="text-2xl font-bold text-white mb-4">Content Analysis</h2>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="p-4 rounded-xl bg-white/5">
+                                    <h3 class="font-semibold text-white mb-2">Sentiment Analysis</h3>
+                                    <div class="flex items-center">
+                                        <div class="w-full bg-gray-700 rounded-full h-2">
+                                            <div class="bg-green-500 h-2 rounded-full" style="width: 75%"></div>
+                                        </div>
+                                        <span class="ml-2 text-sm text-green-400">75% Positive</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="p-4 rounded-xl bg-white/5">
+                                    <h3 class="font-semibold text-white mb-2">Bias Detection</h3>
+                                    <div class="flex items-center">
+                                        <div class="w-full bg-gray-700 rounded-full h-2">
+                                            <div class="bg-blue-500 h-2 rounded-full" style="width: 30%"></div>
+                                        </div>
+                                        <span class="ml-2 text-sm text-blue-400">30% Left Leaning</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="p-4 rounded-xl bg-white/5">
+                                    <h3 class="font-semibold text-white mb-2">Fact-Check Score</h3>
+                                    <div class="flex items-center">
+                                        <div class="w-full bg-gray-700 rounded-full h-2">
+                                            <div class="bg-cyan-500 h-2 rounded-full" style="width: 92%"></div>
+                                        </div>
+                                        <span class="ml-2 text-sm text-cyan-400">92% Verified</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="p-4 rounded-xl bg-white/5">
+                                    <h3 class="font-semibold text-white mb-2">Complexity Level</h3>
+                                    <div class="flex items-center">
+                                        <div class="w-full bg-gray-700 rounded-full h-2">
+                                            <div class="bg-purple-500 h-2 rounded-full" style="width: 65%"></div>
+                                        </div>
+                                        <span class="ml-2 text-sm text-purple-400">Intermediate</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sidebar Column -->
+                    <div class="space-y-6">
+                        <!-- Focus Timer -->
+                        <div class="glass rounded-2xl p-6 card-hover" data-aos="fade-left">
+                            <h2 class="text-xl font-bold text-white mb-4">Focus Timer</h2>
+                            
+                            <div class="flex justify-center mb-6">
+                                <div class="relative">
+                                    <svg class="w-40 h-40 transform -rotate-90" viewBox="0 0 100 100">
+                                        <circle cx="50" cy="50" r="45" stroke="rgba(255,255,255,0.1)" stroke-width="8" fill="none" />
+                                        <circle id="progress-circle" cx="50" cy="50" r="45" stroke="url(#gradient)" stroke-width="8" fill="none" 
+                                                stroke-dasharray="283" stroke-dashoffset="283" class="progress-ring-circle" />
+                                        <defs>
+                                            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                <stop offset="0%" stop-color="#0ea5e9" />
+                                                <stop offset="100%" stop-color="#6366f1" />
+                                            </linearGradient>
+                                        </defs>
+                                    </svg>
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                        <div id="timer-display" class="text-3xl font-bold text-white">25:00</div>
+                                        <div id="timer-state" class="text-sm text-gray-400">Ready to focus</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-3 gap-2 mb-4">
+                                <button data-minutes="25" class="timer-preset py-2 rounded-lg bg-white/5 hover:bg-white/10 transition text-sm">25 min</button>
+                                <button data-minutes="50" class="timer-preset py-2 rounded-lg bg-white/5 hover:bg-white/10 transition text-sm">50 min</button>
+                                <button data-minutes="90" class="timer-preset py-2 rounded-lg bg-white/5 hover:bg-white/10 transition text-sm">90 min</button>
+                            </div>
+                            
+                            <div class="flex space-x-3">
+                                <button id="start-timer" class="flex-1 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-600 transition font-semibold flex items-center justify-center">
+                                    <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                    </svg>
+                                    Start
+                                </button>
+                                <button id="pause-timer" class="flex-1 py-3 rounded-xl bg-white/10 hover:bg-white/20 transition font-semibold flex items-center justify-center" disabled>
+                                    <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="6" y="4" width="4" height="16"></rect>
+                                        <rect x="14" y="4" width="4" height="16"></rect>
+                                    </svg>
+                                    Pause
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- AI Assistant -->
+                        <div class="glass rounded-2xl p-6 card-hover" data-aos="fade-left" data-aos-delay="100">
+                            <h2 class="text-xl font-bold text-white mb-4">AI Assistant</h2>
+                            
+                            <div class="space-y-4">
+                                <div class="p-4 rounded-xl bg-white/5">
+                                    <h3 class="font-semibold text-white mb-2">Today's Reading Summary</h3>
+                                    <p class="text-sm text-gray-400">You've read 12 articles today, spending 42 minutes. Your focus score is 84%.</p>
+                                </div>
+                                
+                                <div class="p-4 rounded-xl bg-white/5">
+                                    <h3 class="font-semibold text-white mb-2">Recommended Topics</h3>
+                                    <div class="flex flex-wrap gap-2">
+                                        <span class="text-xs bg-cyan-500/20 text-cyan-400 px-2 py-1 rounded-full">AI Ethics</span>
+                                        <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded-full">Space Tech</span>
+                                        <span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded-full">Renewable Energy</span>
+                                    </div>
+                                </div>
+                                
+                                <button class="w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 transition flex items-center justify-center">
+                                    <span>Ask AI Assistant</span>
+                                    <svg class="w-4 h-4 ml-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dashboard View -->
+            <div id="view-dashboard" class="view hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Main Dashboard Content -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <!-- Wellness Metrics -->
+                        <div class="glass rounded-2xl p-6 card-hover" data-aos="fade-up">
+                            <h2 class="text-2xl font-bold text-white mb-6">Wellness Metrics</h2>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="p-4 rounded-xl bg-white/5">
+                                    <h3 class="font-semibold text-white mb-2">Mental Wellbeing</h3>
+                                    <div class="flex items-center justify-between">
+                                        <div class="w-3/4">
+                                            <div class="flex justify-between text-sm text-gray-400 mb-1">
+                                                <span>Low</span>
+                                                <span>High</span>
+                                            </div>
+                                            <div class="w-full bg-gray-700 rounded-full h-2">
+                                                <div class="bg-green-500 h-2 rounded-full" style="width: 70%"></div>
+                                            </div>
+                                        </div>
+                                        <span class="text-2xl font-bold text-green-400">7.0</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="p-4 rounded-xl bg-white/5">
+                                    <h3 class="font-semibold text-white mb-2">Information Overload</h3>
+                                    <div class="flex items-center justify-between">
+                                        <div class="w-3/4">
+                                            <div class="flex justify-between text-sm text-gray-400 mb-1">
+                                                <span>Low</span>
+                                                <span>High</span>
+                                            </div>
+                                            <div class="w-full bg-gray-700 rounded-full h-2">
+                                                <div class="bg-yellow-500 h-2 rounded-full" style="width: 45%"></div>
+                                            </div>
+                                        </div>
+                                        <span class="text-2xl font-bold text-yellow-400">4.5</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="p-4 rounded-xl bg-white/5">
+                                    <h3 class="font-semibold text-white mb-2">Focus Duration</h3>
+                                    <div class="flex items-center justify-between">
+                                        <div class="w-3/4">
+                                            <div class="flex justify-between text-sm text-gray-400 mb-1">
+                                                <span>Short</span>
+                                                <span>Long</span>
+                                            </div>
+                                            <div class="w-full bg-gray-700 rounded-full h-2">
+                                                <div class="bg-cyan-500 h-2 rounded-full" style="width: 80%"></div>
+                                            </div>
+                                        </div>
+                                        <span class="text-2xl font-bold text-cyan-400">8.0</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="p-4 rounded-xl bg-white/5">
+                                    <h3 class="font-semibold text-white mb-2">News Consumption</h3>
+                                    <div class="flex items-center justify-between">
+                                        <div class="w-3/4">
+                                            <div class="flex justify-between text-sm text-gray-400 mb-1">
+                                                <span>Low</span>
+                                                <span>High</span>
+                                            </div>
+                                            <div class="w-full bg-gray-700 rounded-full h-2">
+                                                <div class="bg-purple-500 h-2 rounded-full" style="width: 60%"></div>
+                                            </div>
+                                        </div>
+                                        <span class="text-2xl font-bold text-purple-400">6.0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Reading Habits -->
+                        <div class="glass rounded-2xl p-6 card-hover" data-aos="fade-up" data-aos-delay="100">
+                            <h2 class="text-2xl font-bold text-white mb-4">Reading Habits</h2>
+                            
+                            <div class="h-64">
+                                <canvas id="reading-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sidebar -->
+                    <div class="space-y-6">
+                        <!-- Daily Goals -->
+                        <div class="glass rounded-2xl p-6 card-hover" data-aos="fade-left">
+                            <h2 class="text-xl font-bold text-white mb-4">Daily Goals</h2>
+                            
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="font-semibold text-white">Read 5 Articles</h3>
+                                        <p class="text-sm text-gray-400">3/5 completed</p>
+                                    </div>
+                                    <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center">
+                                        <span class="text-white font-bold">60%</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="font-semibold text-white">30 min Focus Session</h3>
+                                        <p class="text-sm text-gray-400">25/30 minutes</p>
+                                    </div>
+                                    <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center">
+                                        <span class="text-white font-bold">83%</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="font-semibold text-white">Diverse Sources</h3>
+                                        <p class="text-sm text-gray-400">4/6 sources</p>
+                                    </div>
+                                    <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center">
+                                        <span class="text-white font-bold">67%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button class="w-full mt-6 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-600 transition font-semibold">
+                                Set New Goals
+                            </button>
+                        </div>
+                        
+                        <!-- Break Suggestions -->
+                        <div class="glass rounded-2xl p-6 card-hover" data-aos="fade-left" data-aos-delay="100">
+                            <h2 class="text-xl font-bold text-white mb-4">Break Suggestions</h2>
+                            
+                            <div class="space-y-4">
+                                <div class="p-4 rounded-xl bg-white/5">
+                                    <h3 class="font-semibold text-white mb-1">Mindful Breathing</h3>
+                                    <p class="text-sm text-gray-400">5-minute guided breathing exercise</p>
+                                </div>
+                                
+                                <div class="p-4 rounded-xl bg-white/5">
+                                    <h3 class="font-semibold text-white mb-1">Quick Stretch</h3>
+                                    <p class="text-sm text-gray-400">3-minute desk stretches</p>
+                                </div>
+                                
+                                <div class="p-4 rounded-xl bg-white/5">
+                                    <h3 class="font-semibold text-white mb-1">Hydration Break</h3>
+                                    <p class="text-sm text-gray-400">Time to drink water</p>
+                                </div>
+                            </div>
+                            
+                            <button class="w-full mt-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 transition font-semibold">
+                                Generate New Suggestions
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Analytics View -->
+            <div id="view-analytics" class="view hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Main Analytics -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <!-- Reading Analytics -->
+                        <div class="glass rounded-2xl p-6 card-hover" data-aos="fade-up">
+                            <h2 class="text-2xl font-bold text-white mb-6">Reading Analytics</h2>
+                            
+                            <div class="h-64">
+                                <canvas id="analytics-chart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- Topic Preferences -->
+                        <div class="glass rounded-2xl p-6 card-hover" data-aos="fade-up" data-aos-delay="100">
+                            <h2 class="text-2xl font-bold text-white mb-4">Topic Preferences</h2>
+                            
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div class="p-4 rounded-xl bg-white/5 text-center">
+                                    <div class="w-12 h-12 rounded-full bg-cyan-500/20 flex items-center justify-center mx-auto mb-2">
+                                        <svg class="w-6 h-6 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"></path>
+                                            <path d="M2 12h20"></path>
+                                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="font-semibold text-white">Technology</h3>
+                                    <p class="text-sm text-gray-400">32%</p>
+                                </div>
+                                
+                                <div class="p-4 rounded-xl bg-white/5 text-center">
+                                    <div class="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-2">
+                                        <svg class="w-6 h-6 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                        </svg>
+                                    </div>
+                                    <h3 class="font-semibold text-white">Science</h3>
+                                    <p class="text-sm text-gray-400">24%</p>
+                                </div>
+                                
+                                <div class="p-4 rounded-xl bg-white/5 text-center">
+                                    <div class="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center mx-auto mb-2">
+                                        <svg class="w-6 h-6 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"></path>
+                                            <path d="M2 12h20"></path>
+                                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="font-semibold text-white">Business</h3>
+                                    <p class="text-sm text-gray-400">18%</p>
+                                </div>
+                                
+                                <div class="p-4 rounded-xl bg-white/5 text-center">
+                                    <div class="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center mx-auto mb-2">
+                                        <svg class="w-6 h-6 text-yellow-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="9" cy="7" r="4"></circle>
+                                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="font-semibold text-white">Politics</h3>
+                                    <p class="text-sm text-gray-400">14%</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sidebar -->
+                    <div class="space-y-6">
+                        <!-- Reading Stats -->
+                        <div class="glass rounded-2xl p-6 card-hover" data-aos="fade-left">
+                            <h2 class="text-xl font-bold text-white mb-4">Reading Stats</h2>
+                            
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400">Articles Read</span>
+                                    <span class="font-semibold text-white">142</span>
+                                </div>
+                                
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400">Time Spent</span>
+                                    <span class="font-semibold text-white">18h 42m</span>
+                                </div>
+                                
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400">Focus Score</span>
+                                    <span class="font-semibold text-green-400">84%</span>
+                                </div>
+                                
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400">Diversity Score</span>
+                                    <span class="font-semibold text-cyan-400">76%</span>
+                                </div>
+                                
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400">Retention Rate</span>
+                                    <span class="font-semibold text-purple-400">68%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- AI Insights -->
+                        <div class="glass rounded-2xl p-6 card-hover" data-aos="fade-left" data-aos-delay="100">
+                            <h2 class="text-xl font-bold text-white mb-4">AI Insights</h2>
+                            
+                            <div class="space-y-4">
+                                <div class="p-4 rounded-xl bg-white/5">
+                                    <h3 class="font-semibold text-white mb-1">Reading Pattern</h3>
+                                    <p class="text-sm text-gray-400">You're most focused between 9-11 AM. Try scheduling important readings during this time.</p>
+                                </div>
+                                
+                                <div class="p-4 rounded-xl bg-white/5">
+                                    <h3 class="font-semibold text-white mb-1">Content Diversity</h3>
+                                    <p class="text-sm text-gray-400">Consider exploring more international news sources for balanced perspectives.</p>
+                                </div>
+                                
+                                <div class="p-4 rounded-xl bg-white/5">
+                                    <h3 class="font-semibold text-white mb-1">Wellness Tip</h3>
+                                    <p class="text-sm text-gray-400">Taking short breaks every 45 minutes improves information retention by 23%.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Settings View -->
+            <div id="view-settings" class="view hidden">
+                <div class="max-w-3xl mx-auto">
+                    <div class="glass rounded-2xl p-6 card-hover" data-aos="fade-up">
+                        <h2 class="text-2xl font-bold text-white mb-6">Settings</h2>
+                        
+                        <div class="space-y-6">
+                            <!-- Account Settings -->
+                            <div>
+                                <h3 class="text-xl font-semibold text-white mb-4">Account Settings</h3>
+                                
+                                <div class="space-y-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-400 mb-1">First Name</label>
+                                            <input type="text" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500" value="Alex">
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-400 mb-1">Last Name</label>
+                                            <input type="text" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500" value="Johnson">
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-400 mb-1">Email</label>
+                                        <input type="email" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500" value="alex.johnson@example.com">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-400 mb-1">News Preferences</label>
+                                        <div class="flex flex-wrap gap-2 mt-2">
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-cyan-500/20 text-cyan-400">
+                                                Technology
+                                                <button type="button" class="ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-cyan-500/30 focus:outline-none">
+                                                    <svg class="w-2 h-2" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                        <line x1="9" y1="3" x2="3" y2="9"></line>
+                                                        <line x1="3" y1="3" x2="9" y2="9"></line>
+                                                    </svg>
+                                                </button>
+                                            </span>
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-500/20 text-green-400">
+                                                Science
+                                                <button type="button" class="ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-green-500/30 focus:outline-none">
+                                                    <svg class="w-2 h-2" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                        <line x1="9" y1="3" x2="3" y2="9"></line>
+                                                        <line x1="3" y1="3" x2="9" y2="9"></line>
+                                                    </svg>
+                                                </button>
+                                            </span>
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-500/20 text-purple-400">
+                                                Business
+                                                <button type="button" class="ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-purple-500/30 focus:outline-none">
+                                                    <svg class="w-2 h-2" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                        <line x1="9" y1="3" x2="3" y2="9"></line>
+                                                        <line x1="3" y1="3" x2="9" y2="9"></line>
+                                                    </svg>
+                                                </button>
+                                            </span>
+                                            <button type="button" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/10 text-white hover:bg-white/20">
+                                                <svg class="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                                </svg>
+                                                Add Topic
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Notification Settings -->
+                            <div>
+                                <h3 class="text-xl font-semibold text-white mb-4">Notification Settings</h3>
+                                
+                                <div class="space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h4 class="font-medium text-white">Email Notifications</h4>
+                                            <p class="text-sm text-gray-400">Receive news digests and updates via email</p>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" class="sr-only peer" checked>
+                                            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-600"></div>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h4 class="font-medium text-white">Push Notifications</h4>
+                                            <p class="text-sm text-gray-400">Get breaking news alerts on your device</p>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" class="sr-only peer" checked>
+                                            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-600"></div>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h4 class="font-medium text-white">Focus Reminders</h4>
+                                            <p class="text-sm text-gray-400">Reminders to take breaks during long reading sessions</p>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" class="sr-only peer">
+                                            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-600"></div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Focus Settings -->
+                            <div>
+                                <h3 class="text-xl font-semibold text-white mb-4">Focus Settings</h3>
+                                
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-400 mb-1">Default Focus Duration</label>
+                                        <select class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                                            <option>25 minutes</option>
+                                            <option selected>50 minutes</option>
+                                            <option>90 minutes</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-400 mb-1">Break Duration</label>
+                                        <select class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                                            <option selected>5 minutes</option>
+                                            <option>10 minutes</option>
+                                            <option>15 minutes</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h4 class="font-medium text-white">Auto-start Focus Mode</h4>
+                                            <p class="text-sm text-gray-400">Automatically start focus timer when opening long articles</p>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" class="sr-only peer" checked>
+                                            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-600"></div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="pt-4 border-t border-white/10">
+                                <button class="px-6 py-3 bg-cyan-500 hover:bg-cyan-600 rounded-lg font-semibold text-white transition">
+                                    Save Changes
+                                </button>
+                                <button class="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-lg font-semibold text-white transition ml-3">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Initialize AOS (Animate On Scroll)
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 100
+        });
+
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Create particle background
+        function createParticles() {
+            const container = document.getElementById('particles-container');
+            const particleCount = 50;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random size between 1-3px
+                const size = Math.random() * 2 + 1;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Random position
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                
+                // Random animation delay and duration
+                const delay = Math.random() * 20;
+                const duration = 15 + Math.random() * 10;
+                particle.style.animationDelay = `${delay}s`;
+                particle.style.animationDuration = `${duration}s`;
+                
+                container.appendChild(particle);
+            }
+        }
+
+        // Navigation functionality
+        function setupNavigation() {
+            const views = document.querySelectorAll('.view');
+            const navButtons = document.querySelectorAll('.nav-btn, .mobile-nav-btn');
+            
+            function switchView(viewId) {
+                // Hide all views
+                views.forEach(view => {
+                    view.classList.add('hidden');
+                    view.classList.remove('active');
+                });
+                
+                // Show selected view
+                const targetView = document.getElementById(`view-${viewId}`);
+                targetView.classList.remove('hidden');
+                targetView.classList.add('active');
+                
+                // Update active nav button
+                navButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.id === `nav-${viewId}` || btn.id === `mobile-nav-${viewId}`) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+            
+            // Add click events to nav buttons
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const viewId = button.id.replace('nav-', '').replace('mobile-nav-', '');
+                    switchView(viewId);
+                });
+            });
+            
+            // Set initial view
+            switchView('news');
+        }
+
+        // Timer functionality
+        function setupTimer() {
+            const timerDisplay = document.getElementById('timer-display');
+            const timerState = document.getElementById('timer-state');
+            const startButton = document.getElementById('start-timer');
+            const pauseButton = document.getElementById('pause-timer');
+            const progressCircle = document.getElementById('progress-circle');
+            const presetButtons = document.querySelectorAll('.timer-preset');
+            
+            let timer;
+            let isRunning = false;
+            let totalSeconds = 25 * 60; // 25 minutes default
+            let remainingSeconds = totalSeconds;
+            let circumference = 283; // 2 * π * r (r=45)
+            
+            function updateDisplay() {
+                const minutes = Math.floor(remainingSeconds / 60);
+                const seconds = remainingSeconds % 60;
+                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                // Update progress circle
+                const offset = circumference - (remainingSeconds / totalSeconds) * circumference;
+                progressCircle.style.strokeDashoffset = offset;
+            }
+            
+            function startTimer() {
+                if (isRunning) return;
+                
+                isRunning = true;
+                startButton.disabled = true;
+                pauseButton.disabled = false;
+                timerState.textContent = 'Focusing...';
+                
+                timer = setInterval(() => {
+                    remainingSeconds--;
+                    updateDisplay();
+                    
+                    if (remainingSeconds <= 0) {
+                        clearInterval(timer);
+                        isRunning = false;
+                        timerState.textContent = 'Time\'s up!';
+                        startButton.disabled = false;
+                        pauseButton.disabled = true;
+                        
+                        // Play completion sound (in a real app)
+                        // new Audio('notification.mp3').play();
+                    }
+                }, 1000);
+            }
+            
+            function pauseTimer() {
+                if (!isRunning) return;
+                
+                clearInterval(timer);
+                isRunning = false;
+                startButton.disabled = false;
+                pauseButton.disabled = true;
+                timerState.textContent = 'Paused';
+            }
+            
+            function resetTimer(minutes) {
+                clearInterval(timer);
+                isRunning = false;
+                totalSeconds = minutes * 60;
+                remainingSeconds = totalSeconds;
+                startButton.disabled = false;
+                pauseButton.disabled = true;
+                timerState.textContent = 'Ready to focus';
+                updateDisplay();
+            }
+            
+            // Event listeners
+            startButton.addEventListener('click', startTimer);
+            pauseButton.addEventListener('click', pauseTimer);
+            
+            presetButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const minutes = parseInt(button.getAttribute('data-minutes'));
+                    resetTimer(minutes);
+                });
+            });
+            
+            // Initialize
+            updateDisplay();
+        }
+
+        // Chart initialization
+        function setupCharts() {
+            // Reading Habits Chart
+            const readingCtx = document.getElementById('reading-chart').getContext('2d');
+            const readingChart = new Chart(readingCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Articles Read',
+                        data: [8, 12, 6, 14, 10, 4, 7],
+                        borderColor: '#0ea5e9',
+                        backgroundColor: 'rgba(14, 165, 233, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: 'Focus Time (min)',
+                        data: [45, 65, 35, 70, 55, 25, 40],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#e2e8f0'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Analytics Chart
+            const analyticsCtx = document.getElementById('analytics-chart').getContext('2d');
+            const analyticsChart = new Chart(analyticsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Reading Time (hours)',
+                        data: [12, 19, 15, 22, 18, 25],
+                        backgroundColor: 'rgba(14, 165, 233, 0.7)',
+                        borderColor: '#0ea5e9',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#e2e8f0'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Simulate loading sequence
+        function simulateLoading() {
+            setTimeout(() => {
+                document.getElementById('app-loader').style.opacity = '0';
+                
+                setTimeout(() => {
+                    document.getElementById('app-loader').style.display = 'none';
+                    document.getElementById('app-container').classList.remove('hidden');
+                    
+                    // Initialize components after loading
+                    createParticles();
+                    setupNavigation();
+                    setupTimer();
+                    setupCharts();
+                }, 800);
+            }, 2500);
+        }
+
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', simulateLoading);
+    </script>
+</body>
+</html>
